@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     try {
         await DBConnect();
         const payload = await request.json();
-        const email = payload.email || payload.username;
+        const email = (payload.email || payload.username)?.toLowerCase().trim();
         const password = payload.password;
 
         if (!email || !password) {
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
         const user = await User.findOne({ email });
         if (!user) {
-            return NextResponse.json({ success: false, error: "Invalid credentials." }, { status: 401 });
+            return NextResponse.json({ success: false, error: `Account not found.${email} ` }, { status: 401 });
         }
 
         const isValid = await bcrypt.compare(password, user.password);

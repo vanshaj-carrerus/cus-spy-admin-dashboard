@@ -26,7 +26,7 @@ const navItems = [
   { name: "My Team", icon: Users, href: "/invite" },
   { name: "Change Manager", icon: Settings, href: "#" },
   { name: "Live Tracking", icon: Locate, href: "#", hasSub: true },
-  { name: "Reports", icon: BarChart3, href: "#", hasSub: true },
+  { name: "Reports", icon: BarChart3, href: "/reports", hasSub: true },
   { name: "Project & Task", icon: CheckSquare, href: "#", hasSub: true },
   { name: "Pricing and Billing", icon: CreditCard, href: "#", hasSub: true },
   { name: "Time Claim", icon: Clock, href: "#", hasSub: true },
@@ -61,8 +61,8 @@ export function Sidebar() {
               key={item.name}
               href={item.href}
               className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 group ${isActive
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
-                  : "text-gray-500 hover:bg-indigo-50 hover:text-indigo-600"
+                ? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
+                : "text-gray-500 hover:bg-indigo-50 hover:text-indigo-600"
                 }`}
             >
               <div className="flex items-center gap-3">
