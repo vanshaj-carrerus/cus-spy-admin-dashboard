@@ -38,7 +38,7 @@ export async function GET(request: Request) {
                 username: user.username,
                 email: user.email,
                 role: user.role,
-                trackedTimeSeconds: timeEntry ? timeEntry.trackedTimeSeconds : 0,
+                trackedTimeSeconds: timeEntry ? timeEntry.totalTrackedSeconds : 0,
                 active: profile ? profile.active : false,
                 lastLogin: profile ? profile.lastLogin : null,
                 departmentId: profile ? profile.departmentId : null,

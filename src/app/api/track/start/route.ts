@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
             await TimeEntry.findOneAndUpdate(
                 { userId, date: dayStart },
-                { $setOnInsert: { trackedTimeSeconds: 0 } },
+                { $setOnInsert: { totalTrackedSeconds: 0 } },
                 { upsert: true, new: true, setDefaultsOnInsert: true }
             );
 

@@ -2,8 +2,14 @@ import mongoose from "mongoose";
 
 const TimeEntrySchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    date: { type: Date, required: true },
-    trackedTimeSeconds: { type: Number, default: 0 },
+    date: { type: Date, required: true }, // Normalized to YYYY-MM-DD
+    sessions: [{
+        sessionId: { type: String, required: true },
+        startTime: { type: Date, default: Date.now },
+        lastHeartbeat: { type: Date, default: Date.now },
+        isActive: { type: Boolean, default: true }
+    }],
+    totalTrackedSeconds: { type: Number, default: 0 }
 }, { timestamps: true });
 
 // Compound index to ensure uniqueness for a given user per day
