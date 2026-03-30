@@ -6,13 +6,15 @@ import DBConnect from "../../../../../lib/DB_Connect";
 export async function POST(request: Request) {
     try {
         await DBConnect();
-        const { username, password } = await request.json();
+        const payload = await request.json();
+        const email = payload.email || payload.username;
+        const password = payload.password;
 
-        if (!username || !password) {
-            return NextResponse.json({ success: false, error: "Username and password are required." }, { status: 400 });
+        if (!email || !password) {
+            return NextResponse.json({ success: false, error: "Email and password are required." }, { status: 400 });
         }
 
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ email });
         if (!user) {
             return NextResponse.json({ success: false, error: "Invalid credentials." }, { status: 401 });
         }
