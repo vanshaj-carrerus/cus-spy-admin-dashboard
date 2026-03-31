@@ -75,3 +75,24 @@ export async function POST(req: NextRequest) {
         );
     }
 }
+
+export async function GET() {
+    try {
+        await DBConnect();
+
+        // Fetch logs and sort by start_time (latest first)
+        const logs = await ActivityLog.find({}).sort({ start_time: -1 }).limit(100);
+
+        return NextResponse.json(
+            { success: true, data: logs },
+            { status: 200 }
+        );
+
+    } catch (error: any) {
+        console.error("Activity Log GET Error:", error);
+        return NextResponse.json(
+            { error: error.message || "Internal Server Error" },
+            { status: 500 }
+        );
+    }
+}
