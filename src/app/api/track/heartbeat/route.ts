@@ -7,7 +7,7 @@ import DBConnect from "../../../../../lib/DB_Connect";
 export async function POST(request: Request) {
     try {
         await DBConnect();
-        const { userId, timestamp, sessionId } = await request.json();
+        const { userId, timestamp, sessionId, productiveSeconds, unproductiveSeconds } = await request.json();
 
         if (!userId || !sessionId) {
             return NextResponse.json({ success: false, error: "Missing userId or sessionId." }, { status: 400 });
@@ -31,7 +31,9 @@ export async function POST(request: Request) {
                     lastHeartbeat: now,
                     isActive: true
                 }],
-                totalTrackedSeconds: 0
+                totalTrackedSeconds: 0,
+                productiveSeconds: Number(productiveSeconds ?? 0),
+                unproductiveSeconds: Number(unproductiveSeconds ?? 0),
             });
         } else {
             const sessionIndex = entry.sessions.findIndex((s: any) => s.sessionId === sessionId);
@@ -63,6 +65,8 @@ export async function POST(request: Request) {
             });
 
             entry.totalTrackedSeconds = totalTracked;
+            entry.productiveSeconds = (entry.productiveSeconds ?? 0) + Number(productiveSeconds ?? 0);
+            entry.unproductiveSeconds = (entry.unproductiveSeconds ?? 0) + Number(unproductiveSeconds ?? 0);
         }
 
         await entry.save();

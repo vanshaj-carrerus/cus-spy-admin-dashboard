@@ -9,6 +9,8 @@ const TimeEntrySchema = new mongoose.Schema({
         lastHeartbeat: { type: Date, default: Date.now },
         isActive: { type: Boolean, default: true }
     }],
+    productiveSeconds: { type: Number, default: 0 },
+    unproductiveSeconds: { type: Number, default: 0 },
     totalTrackedSeconds: { type: Number, default: 0 }
 }, { timestamps: true });
 
