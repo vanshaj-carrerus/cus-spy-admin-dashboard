@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const screenshotSchema = new mongoose.Schema(
+const ScreenshotSchema = new mongoose.Schema(
     {
         userId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -24,6 +24,6 @@ const screenshotSchema = new mongoose.Schema(
 );
 
 const Screenshot =
-    mongoose.models.Screenshot || mongoose.model("Screenshot", screenshotSchema);
+    mongoose.models.Screenshot || mongoose.model("Screenshot", ScreenshotSchema);
 
 export default Screenshot;

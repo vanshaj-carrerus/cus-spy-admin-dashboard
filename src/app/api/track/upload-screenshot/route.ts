@@ -2,8 +2,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
-import Screenshot from "@/models/Screenshot"; // Adjust path as needed
 import DBConnect from "../../../../../lib/DB_Connect";
+import Screenshot from "@/models/screenshot"
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -31,7 +31,7 @@ export async function OPTIONS(req: NextRequest) {
 export async function POST(req: NextRequest) {
     const origin = req.headers.get("origin");
     try {
-        await DBConnect(); // Ensure DB is connected
+        await DBConnect();
 
         const body = await req.json().catch(() => null);
         if (!body) {
