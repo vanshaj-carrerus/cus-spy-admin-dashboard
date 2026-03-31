@@ -53,9 +53,20 @@ export async function POST(req: NextRequest) {
             site = extractSite(title);
         }
 
-        // 3. Save the log
+        // 3. Normalize userId (convert username to ObjectId string if needed)
+        // This ensures referential integrity in the database
+        let resolvedUserId = userId;
+        const user = await ((userId.length === 24)
+            ? ActivityLog.db.model('User').findById(userId)
+            : ActivityLog.db.model('User').findOne({ username: userId }));
+
+        if (user) {
+            resolvedUserId = user._id.toString();
+        }
+
+        // 4. Save the log
         const newLog = await ActivityLog.create({
-            userId,
+            userId: resolvedUserId,
             title,
             app_name,
             start_time: new Date(start_time),
@@ -87,14 +98,21 @@ export async function GET(req: NextRequest) {
 
         let filter: any = {};
         if (filterUserId) {
-            // Need to handle both ObjectId strings and raw username strings
-            // based on how different sidecars might send the ID.
-            filter = {
-                $or: [
-                    { userId: filterUserId },
-                    { userId: filterUserId.slice(0, 24) } // safe check if ID was transformed
-                ]
-            };
+            // Bridge old (username) and new (ObjectId) data
+            // 1. Resolve everything we know about this user
+            const user = await ((filterUserId.length === 24)
+                ? ActivityLog.db.model('User').findById(filterUserId)
+                : ActivityLog.db.model('User').findOne({ username: filterUserId }));
+
+            if (user) {
+                // Return items matching either their ID string OR their username string
+                filter = {
+                    userId: { $in: [user._id.toString(), user.username] }
+                };
+            } else {
+                // Fallback to literal search if user record doesn't exist
+                filter = { userId: filterUserId };
+            }
         }
 
         // Fetch logs (limit search to last 100 for performance)
