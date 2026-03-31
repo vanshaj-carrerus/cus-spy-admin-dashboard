@@ -1,3 +1,5 @@
+// src/app/api/track/upload-screenshot/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 import Screenshot from "@/models/Screenshot"; // Adjust path as needed
