@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import ActivityLog from "@/models/activity_log";
 import DBConnect from "../../../../lib/DB_Connect";
+import { getUserNameFromId } from "../../../../lib/user_utils";
 
 // Browser suffixes to strip from window titles
 const BROWSER_SUFFIXES = [" - Google Chrome", " - Microsoft Edge", " - Mozilla Firefox"];
@@ -76,22 +77,47 @@ export async function POST(req: NextRequest) {
     }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
         await DBConnect();
 
-        // Fetch logs and sort by start_time (latest first)
-        const logs = await ActivityLog.find({}).sort({ start_time: -1 }).limit(100);
+        // Get userId from query params if available
+        const url = new URL(req.url);
+        const filterUserId = url.searchParams.get("userId");
+
+        let filter: any = {};
+        if (filterUserId) {
+            // Need to handle both ObjectId strings and raw username strings
+            // based on how different sidecars might send the ID.
+            filter = {
+                $or: [
+                    { userId: filterUserId },
+                    { userId: filterUserId.slice(0, 24) } // safe check if ID was transformed
+                ]
+            };
+        }
+
+        // Fetch logs (limit search to last 100 for performance)
+        const logs = await ActivityLog.find(filter).sort({ start_time: -1 }).limit(100).lean();
+
+        // Resolve user names for each item
+        const data = await Promise.all(logs.map(async (log: any) => {
+            const userName = await getUserNameFromId(log.userId);
+            return {
+                ...log,
+                userName,
+            };
+        }));
 
         return NextResponse.json(
-            { success: true, data: logs },
+            { success: true, count: data.length, data },
             { status: 200 }
         );
 
     } catch (error: any) {
         console.error("Activity Log GET Error:", error);
         return NextResponse.json(
-            { error: error.message || "Internal Server Error" },
+            { success: false, error: error.message || "Internal Server Error" },
             { status: 500 }
         );
     }
